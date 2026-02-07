@@ -180,19 +180,64 @@ governance-vault/                    # Obsidian vault
 | Technical Standards | Enforced coding rules (3-tier, Supabase SDK, Zod, HMAC) |
 | Automation | 5 scripts for vault integrity (orphans, sync, CI) |
 
-### 3.5 automecanik-rag (Knowledge & RAG)
+### 3.5 automecanik-rag (Knowledge & RAG) — FUNCTIONAL
 
-**Role:** The knowledge brain — domain-specific Retrieval-Augmented Generation for automotive and mechanical expertise.
+**Role:** The knowledge brain — domain-specific Retrieval-Augmented Generation for automotive and mechanical expertise. **Full Python application** with 8,600 lines of code, 352 knowledge documents, and complete Docker infrastructure.
 
-| Concern | Description |
-|---|---|
-| Document Ingestion | Ingest technical manuals, repair guides, parts catalogs, service bulletins |
-| Vector Store | Embed and index domain knowledge for semantic retrieval |
-| RAG Pipeline | Retrieve relevant context and augment LLM responses with domain knowledge |
-| Query API | Expose knowledge search and Q&A endpoints to the platform and agents |
-| Knowledge Management | Version, update, and curate the knowledge base over time |
+**Repository structure:**
+```
+automecanik-rag/
+├── app/                       # FastAPI application
+│   ├── api/                   # Endpoints: chat, search, health, knowledge
+│   ├── services/              # 11 services
+│   │   ├── rag_service.py     # Core RAG pipeline
+│   │   ├── weaviate_client.py # Vector DB client
+│   │   ├── claude_client.py   # Claude LLM integration
+│   │   ├── langgraph_flow.py  # LangGraph orchestration
+│   │   ├── embeddings.py      # Embedding generation
+│   │   ├── security_validator.py
+│   │   └── knowledge_service.py
+│   ├── admin/                 # Admin UI (dashboard, chat, search, settings, docs CRUD)
+│   ├── middleware/             # Rate limiter
+│   └── prompts/templates.py   # Prompt templates
+├── orchestrator/              # Indexation pipeline
+│   ├── pipeline.py            # Index pipeline
+│   ├── kill_switch.py         # Production kill switch (HARDCODED)
+│   └── extractors/            # MinIO + Wiki.js extractors
+├── knowledge/                 # 352 markdown documents
+│   ├── diagnostic/            # ~100 diagnostic fiches
+│   ├── gammes/                # ~200 product range fiches
+│   ├── faq/                   # 8 customer FAQ
+│   ├── guides/                # 6 buying guides
+│   ├── policies/              # 3 company policies
+│   ├── vehicles/              # 8 vehicle fiches
+│   └── seo-data/              # 6 SEO/Google Ads CSV files
+├── scripts/                   # Build index, reindex, Wiki.js import/export
+├── tests/                     # Golden tests (golden_queries.json)
+├── Dockerfile                 # Python 3.11-slim, non-root
+├── docker-compose.yml         # Stack: rag-api + Weaviate + Redis
+├── docker-compose.prod.yml    # Production config
+├── rag_config.yml             # Source of truth config
+└── .github/workflows/         # CI/CD auto reindex
+```
 
-**Existing foundation in Supabase:**
+| Layer | Technology | Purpose |
+|---|---|---|
+| Language | Python 3.11 | RAG application |
+| API | FastAPI | REST endpoints (chat, search, health, knowledge) |
+| Vector DB | **Weaviate** | Semantic search, document embeddings |
+| LLM | **Claude** (Anthropic) | AI-augmented responses |
+| Orchestration | **LangGraph** | RAG pipeline flow orchestration |
+| Document Storage | **MinIO** | Source document storage |
+| Knowledge Source | **Wiki.js** | Knowledge base management |
+| Admin UI | HTML templates | Dashboard, document CRUD, chat testing |
+| Sessions/Cache | Redis | Rate limiting, caching |
+| Deployment | Docker Compose | Multi-service stack (API + Weaviate + Redis) |
+| CI/CD | GitHub Actions | Automated reindexing |
+
+**Knowledge base: 352 documents** covering diagnostics, product ranges, FAQ, buying guides, vehicle fiches, and SEO data.
+
+**Supabase foundation (shared with platform):**
 - `__rag_knowledge` — 5 entries (seed data)
 - `kg_nodes` (83), `kg_edges` (72) — Knowledge Graph for diagnostic reasoning
 - `kg_reasoning_cache`, `kg_safety_triggers` — Diagnostic inference engine
@@ -323,10 +368,16 @@ Developer/AI submits agent
 | Sessions | **Redis** | **Active** |
 | CI/CD | **GitHub Actions** | **Active** — push main = auto deploy |
 | Production | **Docker + Caddy** | **Active** — reverse proxy, port 3000 |
-| Vector Database | **pgvector** (via Supabase) | Available — native PostgreSQL extension |
+| RAG Language | **Python 3.11** | **Active** — automecanik-rag |
+| RAG Framework | **FastAPI** | **Active** — REST API |
+| Vector Database | **Weaviate** | **Active** — semantic search |
+| LLM | **Claude (Anthropic)** | **Active** — AI-augmented responses |
+| RAG Orchestration | **LangGraph** | **Active** — pipeline flow |
+| Document Storage | **MinIO** | **Active** — source documents |
+| Knowledge Source | **Wiki.js** | **Active** — knowledge management |
+| Knowledge Base | **352 markdown docs** | **Active** — diagnostics, gammes, FAQ, guides |
 | Knowledge Graph | **PostgreSQL** (kg_* tables) | **Active** — 83 nodes, 72 edges |
-| RAG Foundation | **PostgreSQL** (__rag_knowledge, kg_rag_*) | **Seeded** — 5 entries |
-| Embeddings | TBD (OpenAI/Cohere/local) | To decide |
+| KG ↔ RAG Sync | **PostgreSQL** (kg_rag_*) | **Active** |
 | Monitoring | TBD | To decide |
 
 ## 8. Scaling Strategy
@@ -341,11 +392,12 @@ Developer/AI submits agent
 - [x] Establish repo structure and contracts — **DONE**
 
 **Phase 2 — AI Augmentation (current)**
-- [ ] Scale RAG from 5 entries to full knowledge base (blog content, repair guides, KG data)
-- [ ] Integrate diagnostic engine with RAG pipeline
-- [ ] Define governance framework — on `governance-vault`
-- [ ] Set up first AI agents — on `agent-submissions`
+- [x] Build RAG system — **DONE** (Python 3.11/FastAPI, 8,600 lines, 352 knowledge docs, Weaviate + Claude + LangGraph)
+- [x] Define governance framework — **DONE** on `governance-vault` (Obsidian vault, RULE-H0 to H6, R1-R7)
+- [x] Set up agent submission workflow — **DONE** on `agent-submissions` (bundle-based, signed patches)
+- [ ] Integrate diagnostic engine with RAG pipeline (KG ↔ RAG sync)
 - [ ] Connect subsystems to the live platform via defined contracts
+- [ ] Deploy RAG alongside production platform
 
 **Phase 3 — Full AI Operations**
 - Multi-agent orchestration

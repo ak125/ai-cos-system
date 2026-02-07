@@ -21,7 +21,9 @@ This is not a standalone application — it is the **umbrella system** that ties
 - **Data hosted on Supabase** (PostgreSQL) — project `massdoc`, ~100 GB
 - **Migrated from legacy MySQL** to PostgreSQL with full data pipeline
 
-**Tech stack (production):** NestJS 10 + Remix 2.15 + React 18 | Supabase (no Prisma) | Redis sessions | Turborepo + npm workspaces | Zod validation | Docker + Caddy | GitHub Actions CI/CD
+**Platform tech stack:** NestJS 10 + Remix 2.15 + React 18 | Supabase (no Prisma) | Redis sessions | Turborepo + npm workspaces | Zod validation | Docker + Caddy | GitHub Actions CI/CD
+
+**RAG tech stack:** Python 3.11 + FastAPI | Weaviate (vector DB) | Claude LLM (Anthropic) | LangGraph orchestration | MinIO + Wiki.js | 352 knowledge docs | Docker Compose multi-service
 
 ## Ecosystem Architecture
 
@@ -58,10 +60,10 @@ ai-cos-system/                          # Central orchestration & system design
 
 | Repository | Role | Description |
 |---|---|---|
-| **nestjs-remix-monorepo** | Core Platform | NestJS backend + Remix frontend. Development repo → **preprod** → **production** (live Automecanik site) |
-| **agent-submissions** | AI Agent Registry | Manages AI agent definitions, submissions, validation, and deployment workflows |
-| **governance-vault** | Governance & Rules | Company governance framework — policies, decision records, compliance rules, and organizational structure |
-| **automecanik-rag** | Knowledge & RAG | Retrieval-Augmented Generation system for automotive/mechanical domain knowledge |
+| **nestjs-remix-monorepo** | Core Platform | **TypeScript** — NestJS 10 (38 modules) + Remix 2.15 (191 routes) + React 18. Supabase, Redis, Turborepo, Docker+Caddy. Dev → preprod → **production** (live site) |
+| **agent-submissions** | AI Agent Registry | Bundle-based agent submission with signed patches, `constraints.json`, `evidence.json`. Validation against governance rules before deployment |
+| **governance-vault** | Governance & Rules | **Obsidian vault** — RULE-H0 to H6 (human authority), R-Vault-01 to 04 (vault rules), R1-R7 (technical rules). 5 automation scripts, ADR/DEC conventions |
+| **automecanik-rag** | Knowledge & RAG | **Python 3.11** — FastAPI + Weaviate + Claude LLM + LangGraph. 8,600 lines, 352 knowledge docs, Docker multi-service stack, admin UI, golden tests |
 
 ### How they connect
 
@@ -107,10 +109,15 @@ This repo contains:
 
 ### Cross-repo conventions
 
-- All repos follow the same commit message style (conventional commits preferred)
-- Shared TypeScript/Node.js ecosystem (NestJS + Remix stack)
+- All repos follow conventional commits (preferred commit message style)
+- **Heterogeneous tech ecosystem:**
+  - `nestjs-remix-monorepo` — TypeScript (NestJS + Remix), npm, Turborepo
+  - `automecanik-rag` — Python 3.11, FastAPI, pip, Docker Compose
+  - `agent-submissions` — Bundle-based (JSON + signed patches)
+  - `governance-vault` — Obsidian vault (Markdown documents + shell scripts)
 - Each repo has its own CLAUDE.md with repo-specific guidance
 - Changes that affect multiple repos should be documented here first
+- Shared database: all subsystems connect to Supabase `massdoc` (PostgreSQL)
 
 ### Branching strategy
 
@@ -146,10 +153,12 @@ Track major architectural and organizational decisions here:
 - [x] Define integration contracts between the 4 subsystems
 - [x] Document agent lifecycle (submission -> validation -> deployment)
 - [x] Establish governance-to-platform enforcement pipeline
+- [x] Study and document all 4 repo architectures (actual tech stacks, structures, capabilities)
 - [ ] Set up shared CI/CD pipeline orchestration
 - [ ] Create cross-repo automation scripts
 - [ ] Implement service health checks
-- [ ] Build shared TypeScript types package from OpenAPI specs
+- [ ] Connect RAG to live platform (KG ↔ RAG sync, diagnostic integration)
+- [ ] Build shared types from OpenAPI specs (TypeScript for platform, Python for RAG)
 
 ## Notes
 
