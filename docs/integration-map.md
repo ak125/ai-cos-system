@@ -4,12 +4,13 @@ How the AI-COS subsystems communicate and depend on each other.
 
 ## Dependency Matrix
 
-| From ↓ / To → | ai-cos-system | nestjs-remix-monorepo | agent-submissions | governance-vault |
-|---|---|---|---|---|
-| **ai-cos-system** | — | Provides contracts & config | Provides contracts & config | Provides contracts & config |
-| **nestjs-remix-monorepo** | Reads specs | — | Invokes agents, reads registry | Checks policies, reads rules |
-| **agent-submissions** | Reads specs | Deploys agents to platform | — | Validates against policies |
-| **governance-vault** | Reads specs | Pushes rule updates | Pushes constraint updates | — |
+| From ↓ / To → | ai-cos-system | nestjs-remix-monorepo | agent-submissions | governance-vault | automecanik-rag |
+|---|---|---|---|---|---|
+| **ai-cos-system** | — | Provides contracts & config | Provides contracts & config | Provides contracts & config | Provides contracts & config |
+| **nestjs-remix-monorepo** | Reads specs | — | Invokes agents, reads registry | Checks policies, reads rules | Queries knowledge, retrieves context |
+| **agent-submissions** | Reads specs | Deploys agents to platform | — | Validates against policies | Agents query domain knowledge |
+| **governance-vault** | Reads specs | Pushes rule updates | Pushes constraint updates | — | — |
+| **automecanik-rag** | Reads specs | Serves knowledge API | Provides context to agents | — | — |
 
 ## Integration Points
 
@@ -58,7 +59,36 @@ agent-submissions              governance-vault
 
 **Contract:** `specs/agents-governance.yaml`
 
-### 4. Orchestrator → All Subsystems
+### 4. Platform ↔ Knowledge (RAG)
+
+**Purpose:** The platform queries automotive domain knowledge to answer user questions and provide context to agents.
+
+```
+nestjs-remix-monorepo          automecanik-rag
+       │                              │
+       │── POST /query ──────────────►│  Semantic search + AI answer
+       │── POST /search ─────────────►│  Raw document retrieval
+       │── GET /documents ───────────►│  List indexed documents
+       │── POST /documents/ingest ───►│  Ingest new documents
+       │── GET /health ──────────────►│  RAG pipeline health
+```
+
+**Contract:** `specs/platform-rag.yaml`
+
+### 5. Agents ↔ Knowledge (RAG)
+
+**Purpose:** AI agents query the knowledge base for domain-specific context during task execution.
+
+```
+agent-submissions              automecanik-rag
+       │                              │
+       │── POST /query ──────────────►│  Agent retrieves domain context
+       │── POST /search ─────────────►│  Agent searches documents
+```
+
+Uses the same API contract as Platform ↔ RAG (`specs/platform-rag.yaml`).
+
+### 6. Orchestrator → All Subsystems
 
 **Purpose:** ai-cos-system coordinates cross-cutting concerns.
 
@@ -85,6 +115,9 @@ ai-cos-system
 | `policy.updated` | governance-vault | all | Policy changed |
 | `policy.revoked` | governance-vault | all | Policy removed |
 | `platform.action` | nestjs-remix-monorepo | governance-vault | Action for audit |
+| `knowledge.ingested` | automecanik-rag | ai-cos-system | New documents indexed |
+| `knowledge.updated` | automecanik-rag | nestjs-remix-monorepo | Knowledge base updated |
+| `knowledge.query` | nestjs-remix-monorepo | automecanik-rag | Knowledge query request |
 
 ## Shared Data Schemas
 
@@ -131,6 +164,49 @@ All subsystems agree on these core entity shapes (defined in `specs/schemas/`):
     "rationale": "string",
     "createdAt": "ISO 8601",
     "effectiveDate": "ISO 8601"
+  }
+}
+```
+
+### KnowledgeDocument
+
+```json
+{
+  "id": "string (uuid)",
+  "title": "string",
+  "source": "string (file path, URL, or manual entry)",
+  "category": "repair-guide | parts-catalog | service-bulletin | technical-manual | diagnostic",
+  "content": "string (raw text)",
+  "embeddings": "vector (generated)",
+  "metadata": {
+    "make": "string (vehicle manufacturer)",
+    "model": "string (vehicle model, optional)",
+    "year": "string (year range, optional)",
+    "language": "string (ISO 639-1)",
+    "ingestedAt": "ISO 8601",
+    "updatedAt": "ISO 8601"
+  }
+}
+```
+
+### QueryResult
+
+```json
+{
+  "query": "string",
+  "answer": "string (AI-generated response)",
+  "sources": [
+    {
+      "documentId": "string (uuid)",
+      "title": "string",
+      "relevanceScore": "number (0-1)",
+      "excerpt": "string"
+    }
+  ],
+  "metadata": {
+    "model": "string (LLM used)",
+    "tokensUsed": "number",
+    "processingTime": "number (ms)"
   }
 }
 ```

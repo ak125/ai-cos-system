@@ -44,4 +44,10 @@ services:
     endpoints:
       api: "${GOVERNANCE_API_URL}"
       health: "${GOVERNANCE_API_URL}/health"
+
+  knowledge:
+    repo: automecanik-rag
+    endpoints:
+      api: "${RAG_API_URL}"
+      health: "${RAG_API_URL}/health"
 ```

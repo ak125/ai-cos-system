@@ -22,15 +22,15 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 │  └─────────────┘  └──────────────┘  └────────────────┘  │
 └──────────────────────┬──────────────────────────────────┘
                        │
-       ┌───────────────┼───────────────┐
-       │               │               │
-┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-│  PLATFORM   │ │   AGENTS    │ │ GOVERNANCE  │
-│             │ │             │ │             │
-│  nestjs-    │ │  agent-     │ │ governance- │
-│  remix-     │ │  submissions│ │ vault       │
-│  monorepo   │ │             │ │             │
-└─────────────┘ └─────────────┘ └─────────────┘
+       ┌───────────────┼───────────────┬───────────────┐
+       │               │               │               │
+┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
+│  PLATFORM   │ │   AGENTS    │ │ GOVERNANCE  │ │  KNOWLEDGE  │
+│             │ │             │ │             │ │             │
+│  nestjs-    │ │  agent-     │ │ governance- │ │ automecanik-│
+│  remix-     │ │  submissions│ │ vault       │ │ rag         │
+│  monorepo   │ │             │ │             │ │             │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
 ## 3. Subsystem Responsibilities
@@ -83,6 +83,18 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 | Org Structure | Roles, permissions, hierarchies, delegation rules |
 | Agent Constraints | Boundaries and permissions for AI agent behavior |
 
+### 3.5 automecanik-rag (Knowledge & RAG)
+
+**Role:** The knowledge brain — domain-specific Retrieval-Augmented Generation for automotive and mechanical expertise.
+
+| Concern | Description |
+|---|---|
+| Document Ingestion | Ingest technical manuals, repair guides, parts catalogs, service bulletins |
+| Vector Store | Embed and index domain knowledge for semantic retrieval |
+| RAG Pipeline | Retrieve relevant context and augment LLM responses with domain knowledge |
+| Query API | Expose knowledge search and Q&A endpoints to the platform and agents |
+| Knowledge Management | Version, update, and curate the knowledge base over time |
+
 ## 4. Data Flow Patterns
 
 ### 4.1 Agent Submission Flow
@@ -132,8 +144,30 @@ Developer/AI submits agent
   (handle request)
         │
         ├──► agent-submissions    (invoke AI agent if needed)
+        ├──► governance-vault     (check permissions/rules)
+        └──► automecanik-rag     (query domain knowledge)
+```
+
+### 4.4 Knowledge Query Flow
+
+```
+  User asks automotive question
         │
-        └──► governance-vault     (check permissions/rules)
+        ▼
+  nestjs-remix-monorepo
+  (receive query)
+        │
+        ▼
+  automecanik-rag              ◄── semantic search in vector store
+  (retrieve + augment)
+        │
+        ▼
+  AI Agent (if needed)         ◄── agent uses RAG context for response
+  (generate answer)
+        │
+        ▼
+  nestjs-remix-monorepo
+  (return to user)
 ```
 
 ## 5. Communication Patterns
@@ -181,6 +215,8 @@ Developer/AI submits agent
 | Message Queue | TBD | To decide |
 | CI/CD | TBD (GitHub Actions likely) | To decide |
 | Hosting | TBD | To decide |
+| Vector Database | TBD (Pinecone/Weaviate/pgvector) | To decide |
+| Embeddings | TBD (OpenAI/Cohere/local) | To decide |
 | Monitoring | TBD | To decide |
 
 ## 8. Scaling Strategy
@@ -192,7 +228,8 @@ Developer/AI submits agent
 - Set up first AI agents
 
 **Phase 2 — Integration**
-- Connect all 3 subsystems via defined contracts
+- Connect all 4 subsystems via defined contracts
+- Integrate RAG knowledge pipeline with platform and agents
 - Implement event-driven communication
 - Automated governance enforcement
 - CI/CD across all repos

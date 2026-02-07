@@ -28,7 +28,8 @@ ai-cos-system/                          # Central orchestration & system design
 ├── specs/                              # OpenAPI contracts between subsystems
 │   ├── platform-agents.yaml            # nestjs-remix ↔ agent-submissions
 │   ├── platform-governance.yaml        # nestjs-remix ↔ governance-vault
-│   └── agents-governance.yaml          # agent-submissions ↔ governance-vault
+│   ├── agents-governance.yaml          # agent-submissions ↔ governance-vault
+│   └── platform-rag.yaml              # nestjs-remix ↔ automecanik-rag
 │
 ├── config/                             # Shared configuration & environment
 │   └── README.md                       # Config structure & conventions
@@ -44,26 +45,27 @@ ai-cos-system/                          # Central orchestration & system design
 | **nestjs-remix-monorepo** | Core Platform | Main tech stack — NestJS backend + Remix frontend. Handles product, APIs, UI, and business logic |
 | **agent-submissions** | AI Agent Registry | Manages AI agent definitions, submissions, validation, and deployment workflows |
 | **governance-vault** | Governance & Rules | Company governance framework — policies, decision records, compliance rules, and organizational structure |
+| **automecanik-rag** | Knowledge & RAG | Retrieval-Augmented Generation system for automotive/mechanical domain knowledge |
 
 ### How they connect
 
 ```
-                    ┌─────────────────────┐
-                    │   ai-cos-system     │
-                    │  (orchestration &   │
-                    │   system design)    │
-                    └────────┬────────────┘
-                             │
-            ┌────────────────┼────────────────┐
-            │                │                │
-   ┌────────▼──────┐  ┌─────▼──────┐  ┌──────▼───────┐
-   │  nestjs-remix  │  │   agent-   │  │  governance- │
-   │   monorepo     │  │submissions │  │    vault     │
-   │                │  │            │  │              │
-   │ Product/APIs/  │  │ AI agents  │  │  Policies/   │
-   │ UI/Business    │  │ registry & │  │  Rules/      │
-   │ logic          │  │ workflows  │  │  Compliance  │
-   └────────────────┘  └────────────┘  └──────────────┘
+                       ┌─────────────────────┐
+                       │   ai-cos-system     │
+                       │  (orchestration &   │
+                       │   system design)    │
+                       └────────┬────────────┘
+                                │
+       ┌────────────┬───────────┼───────────┬────────────┐
+       │            │           │           │            │
+┌──────▼───┐ ┌──────▼──────┐ ┌─▼──────────┐ ┌──────▼───────┐
+│ nestjs-  │ │   agent-    │ │ governance-│ │ automecanik- │
+│ remix-   │ │ submissions │ │ vault      │ │ rag          │
+│ monorepo │ │             │ │            │ │              │
+│          │ │ AI agents   │ │ Policies/  │ │ Knowledge/   │
+│ Product/ │ │ registry &  │ │ Rules/     │ │ RAG/         │
+│ APIs/UI  │ │ workflows   │ │ Compliance │ │ Automotive   │
+└──────────┘ └─────────────┘ └────────────┘ └──────────────┘
 ```
 
 ## AI-Driven Company Principles
@@ -122,7 +124,7 @@ Track major architectural and organizational decisions here:
 
 ## Roadmap Priorities
 
-- [x] Define integration contracts between the 3 subsystems
+- [x] Define integration contracts between the 4 subsystems
 - [x] Document agent lifecycle (submission -> validation -> deployment)
 - [x] Establish governance-to-platform enforcement pipeline
 - [ ] Set up shared CI/CD pipeline orchestration

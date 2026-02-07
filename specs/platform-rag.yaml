@@ -1,0 +1,479 @@
+openapi: 3.1.0
+info:
+  title: Platform ↔ AutoMecanik RAG API
+  description: |
+    Contract between nestjs-remix-monorepo (platform) / agent-submissions and automecanik-rag.
+    Provides domain-specific knowledge retrieval and AI-augmented answers
+    for automotive and mechanical expertise.
+  version: 0.1.0
+  contact:
+    name: ai-cos-system
+
+paths:
+  /query:
+    post:
+      summary: Query the knowledge base with AI-augmented response
+      description: |
+        Performs semantic search across the automotive knowledge base,
+        retrieves relevant documents, and returns an AI-generated answer
+        augmented with domain context.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+      responses:
+        "200":
+          description: AI-augmented answer with sources
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResponse"
+        "400":
+          description: Invalid query
+        "503":
+          description: RAG pipeline unavailable
+
+  /search:
+    post:
+      summary: Search documents without AI generation
+      description: |
+        Performs semantic search and returns matching document excerpts
+        without generating an AI response. Useful for raw retrieval.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Matching documents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+
+  /documents:
+    get:
+      summary: List indexed documents
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [repair-guide, parts-catalog, service-bulletin, technical-manual, diagnostic]
+        - name: make
+          in: query
+          schema:
+            type: string
+          description: Filter by vehicle manufacturer
+        - name: model
+          in: query
+          schema:
+            type: string
+          description: Filter by vehicle model
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of indexed documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DocumentSummary"
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+
+  /documents/ingest:
+    post:
+      summary: Ingest new documents into the knowledge base
+      description: |
+        Submit documents for processing, embedding, and indexing.
+        Documents are chunked, embedded, and stored in the vector database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestRequest"
+      responses:
+        "202":
+          description: Documents accepted for ingestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResponse"
+        "400":
+          description: Invalid document format
+
+  /documents/{documentId}:
+    get:
+      summary: Get document details
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Document details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "404":
+          description: Document not found
+    delete:
+      summary: Remove document from knowledge base
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Document removed
+        "404":
+          description: Document not found
+
+  /collections:
+    get:
+      summary: List knowledge collections
+      description: Collections group related documents (e.g., by make, topic, source)
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+
+  /health:
+    get:
+      summary: RAG pipeline health check
+      responses:
+        "200":
+          description: System healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: System unhealthy
+
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+          description: Natural language question about automotive/mechanical topics
+        context:
+          type: object
+          description: Additional context (vehicle make, model, year, symptoms)
+          properties:
+            make:
+              type: string
+            model:
+              type: string
+            year:
+              type: integer
+            symptoms:
+              type: array
+              items:
+                type: string
+        maxSources:
+          type: integer
+          default: 5
+          description: Maximum number of source documents to return
+        language:
+          type: string
+          default: "fr"
+          description: Response language (ISO 639-1)
+        requestedBy:
+          type: string
+          description: ID of the user or agent making the request
+
+    QueryResponse:
+      type: object
+      required: [answer, sources]
+      properties:
+        answer:
+          type: string
+          description: AI-generated answer augmented with domain knowledge
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Confidence score of the answer
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceReference"
+        metadata:
+          type: object
+          properties:
+            model:
+              type: string
+              description: LLM model used for generation
+            tokensUsed:
+              type: integer
+            processingTimeMs:
+              type: integer
+            retrievalTimeMs:
+              type: integer
+
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        filters:
+          type: object
+          properties:
+            category:
+              type: string
+              enum: [repair-guide, parts-catalog, service-bulletin, technical-manual, diagnostic]
+            make:
+              type: string
+            model:
+              type: string
+            year:
+              type: integer
+        limit:
+          type: integer
+          default: 10
+        minScore:
+          type: number
+          default: 0.7
+          description: Minimum relevance score threshold
+
+    SearchResponse:
+      type: object
+      required: [results]
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+        total:
+          type: integer
+        processingTimeMs:
+          type: integer
+
+    SearchResult:
+      type: object
+      required: [documentId, score, excerpt]
+      properties:
+        documentId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        category:
+          type: string
+        score:
+          type: number
+          description: Relevance score (0-1)
+        excerpt:
+          type: string
+          description: Relevant text excerpt from the document
+        metadata:
+          type: object
+
+    SourceReference:
+      type: object
+      required: [documentId, title, relevanceScore]
+      properties:
+        documentId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        relevanceScore:
+          type: number
+        excerpt:
+          type: string
+        category:
+          type: string
+
+    IngestRequest:
+      type: object
+      required: [documents]
+      properties:
+        documents:
+          type: array
+          items:
+            type: object
+            required: [title, content, category]
+            properties:
+              title:
+                type: string
+              content:
+                type: string
+                description: Raw text content of the document
+              category:
+                type: string
+                enum: [repair-guide, parts-catalog, service-bulletin, technical-manual, diagnostic]
+              sourceUrl:
+                type: string
+                format: uri
+              metadata:
+                type: object
+                properties:
+                  make:
+                    type: string
+                  model:
+                    type: string
+                  year:
+                    type: string
+                  language:
+                    type: string
+                    default: "fr"
+        collectionId:
+          type: string
+          format: uuid
+          description: Optional collection to add documents to
+
+    IngestResponse:
+      type: object
+      required: [jobId, status, documentsAccepted]
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [accepted, processing, completed, failed]
+        documentsAccepted:
+          type: integer
+        estimatedCompletionMs:
+          type: integer
+
+    Document:
+      type: object
+      required: [id, title, category, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        category:
+          type: string
+          enum: [repair-guide, parts-catalog, service-bulletin, technical-manual, diagnostic]
+        status:
+          type: string
+          enum: [ingesting, indexed, failed]
+        chunkCount:
+          type: integer
+          description: Number of chunks created from this document
+        metadata:
+          type: object
+          properties:
+            make:
+              type: string
+            model:
+              type: string
+            year:
+              type: string
+            language:
+              type: string
+            sourceUrl:
+              type: string
+            ingestedAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    DocumentSummary:
+      type: object
+      required: [id, title, category, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [ingesting, indexed, failed]
+        chunkCount:
+          type: integer
+        ingestedAt:
+          type: string
+          format: date-time
+
+    Collection:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        documentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        components:
+          type: object
+          properties:
+            vectorStore:
+              type: string
+              enum: [up, down]
+            embeddingService:
+              type: string
+              enum: [up, down]
+            llmService:
+              type: string
+              enum: [up, down]
+        documentCount:
+          type: integer
+        lastIngestion:
+          type: string
+          format: date-time
