@@ -6,12 +6,13 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 
 **Automecanik** is a **live, production** automotive parts e-commerce platform with:
 - **Site in production** — all application code in `nestjs-remix-monorepo` (NestJS + Remix)
-- **3.5M+ parts** in catalog, **146M+ vehicle-part compatibility relations**
-- **59K+ customers**, **1.6K+ orders**, migrated from a legacy MySQL system
+- **4M+ products**, **59K+ customers**, **9K+ categories**
+- **146M+ vehicle-part compatibility relations**, **48,918 motorizations**
 - A sophisticated **SEO engine** (80+ tables, 321K pages, keyword system, quality scoring)
 - A **Knowledge Graph** for automotive diagnostics
 - An **import pipeline** with staging → normalization → cross-reference layers (CQRS pattern)
 - All data hosted on **Supabase** (PostgreSQL) — project `massdoc`
+- **Docker + Caddy** production deployment, **Redis** for sessions
 
 ## 2. System Layers
 
@@ -63,15 +64,52 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 **Deployment pipeline:**
 ```
 nestjs-remix-monorepo (dev) ──► preprod ──► prod
+Push sur main = déploiement automatique
+```
+
+**Monorepo structure:**
+```
+nestjs-remix-monorepo/
+├── backend/               # NestJS API (38 modules métier)
+│   ├── src/modules/       # Business modules
+│   ├── src/auth/          # Authentication
+│   ├── src/database/      # Supabase data services
+│   └── supabase/migrations/ # SQL migrations
+├── frontend/              # Remix SSR (191 routes)
+│   ├── app/components/    # React components
+│   ├── app/routes/        # Page routes
+│   └── app/services/      # API services
+├── packages/              # Shared libraries
+│   ├── database-types/    # @repo/database-types (Supabase-generated)
+│   ├── shared-types/      # @monorepo/shared-types (Zod schemas)
+│   ├── ui/                # @fafa/ui (Radix UI + Tailwind)
+│   ├── design-tokens/     # @fafa/design-tokens
+│   ├── typescript-config/ # @fafa/typescript-config
+│   └── eslint-config/     # @fafa/eslint-config
+├── .spec/                 # Technical documentation
+│   ├── 00-canon/          # Canonical files (source of truth)
+│   ├── api/               # API specs
+│   └── architecture/      # ADRs
+├── Dockerfile             # Production Docker image
+└── docker-compose.prod.yml
 ```
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Backend API | NestJS | REST/GraphQL APIs, business logic, data persistence |
-| Frontend | Remix | SSR web application, UI components, user experience |
-| Database | Supabase (PostgreSQL) | 200+ tables, 3.5M parts, vehicle catalog, orders |
-| Auth | Supabase Auth | Authentication, authorization, role management |
-| Queue/Events | TBD | Async processing, event-driven workflows |
+| Backend API | NestJS 10 (38 modules) | REST APIs, business logic, Supabase data services |
+| Frontend | Remix 2.15 + React 18 | SSR, 191 routes, React Query + Zustand |
+| UI Library | Radix UI + Tailwind (shadcn/ui) | @fafa/ui component library |
+| Database | Supabase (PostgreSQL) | 200+ tables, direct SDK (no Prisma) |
+| Sessions | Redis | Server-side session management |
+| Build | Turborepo + npm workspaces | Monorepo orchestration |
+| Validation | Zod | Schema validation (controllers + shared types) |
+| CI/CD | GitHub Actions | Automated pipeline |
+| Production | Docker + Caddy | Reverse proxy, single port 3000 |
+
+**Three-tier backend pattern:**
+1. **Controllers** — HTTP/validation layer (Zod schemas)
+2. **Services** — Business logic orchestration
+3. **Data Services** — Direct Supabase queries (no ORM)
 
 **Key data domains served by the platform:**
 - Parts catalog (`pieces`, `pieces_criteria`, `pieces_relation_type`)
@@ -234,19 +272,22 @@ Developer/AI submits agent
 
 | Layer | Technology | Status |
 |---|---|---|
-| Backend Framework | NestJS | Active |
-| Frontend Framework | Remix | Active |
-| Language | TypeScript | Active |
+| Backend Framework | **NestJS 10** | **Active** — 38 modules |
+| Frontend Framework | **Remix 2.15 + React 18** | **Active** — 191 routes |
+| Language | **TypeScript 5** | **Active** |
+| Validation | **Zod** | **Active** — controllers + shared types |
+| UI Library | **Radix UI + Tailwind** (shadcn/ui) | **Active** — @fafa/ui |
+| Package Manager | **npm 10** + workspaces | **Active** |
+| Build System | **Turborepo** | **Active** |
 | Database | **Supabase (PostgreSQL)** | **Active** — project `massdoc`, 200+ tables |
+| Database SDK | **@supabase/supabase-js** | **Active** — no Prisma/ORM |
 | Database Hosting | **Supabase Pro** (ak125's Org) | **Active** |
+| Sessions | **Redis** | **Active** |
+| CI/CD | **GitHub Actions** | **Active** — push main = auto deploy |
+| Production | **Docker + Caddy** | **Active** — reverse proxy, port 3000 |
 | Vector Database | **pgvector** (via Supabase) | Available — native PostgreSQL extension |
 | Knowledge Graph | **PostgreSQL** (kg_* tables) | **Active** — 83 nodes, 72 edges |
 | RAG Foundation | **PostgreSQL** (__rag_knowledge, kg_rag_*) | **Seeded** — 5 entries |
-| Package Manager | TBD (npm/pnpm/yarn) | To decide |
-| Cache | TBD | To decide |
-| Message Queue | TBD | To decide |
-| CI/CD | TBD (GitHub Actions likely) | To decide |
-| Hosting | TBD | To decide |
 | Embeddings | TBD (OpenAI/Cohere/local) | To decide |
 | Monitoring | TBD | To decide |
 

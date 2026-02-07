@@ -21,6 +21,8 @@ This is not a standalone application — it is the **umbrella system** that ties
 - **Data hosted on Supabase** (PostgreSQL) — project `massdoc`, ~100 GB
 - **Migrated from legacy MySQL** to PostgreSQL with full data pipeline
 
+**Tech stack (production):** NestJS 10 + Remix 2.15 + React 18 | Supabase (no Prisma) | Redis sessions | Turborepo + npm workspaces | Zod validation | Docker + Caddy | GitHub Actions CI/CD
+
 ## Ecosystem Architecture
 
 ```
