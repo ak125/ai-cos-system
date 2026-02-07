@@ -1,0 +1,218 @@
+openapi: 3.1.0
+info:
+  title: Agent Registry ↔ Governance API
+  description: |
+    Contract between agent-submissions and governance-vault.
+    Ensures AI agents comply with governance rules throughout their lifecycle.
+  version: 0.1.0
+  contact:
+    name: ai-cos-system
+
+paths:
+  /validate-agent:
+    post:
+      summary: Validate an agent against governance policies
+      description: |
+        Submitted when a new agent (or updated version) needs compliance checking.
+        Governance evaluates the agent's capabilities, constraints, and metadata
+        against active policies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentValidationRequest"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentValidationResponse"
+        "400":
+          description: Invalid request
+
+  /constraints:
+    get:
+      summary: Get all agent constraints
+      description: Returns the current set of constraints that apply to agents
+      parameters:
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Get constraints specific to an agent (in addition to global)
+      responses:
+        "200":
+          description: Agent constraints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentConstraint"
+
+  /audit-log:
+    post:
+      summary: Report agent action to governance
+      description: Agents report their actions for audit and compliance tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentAuditReport"
+      responses:
+        "201":
+          description: Audit report recorded
+        "400":
+          description: Invalid report
+
+  /compliance-status/{agentId}:
+    get:
+      summary: Check agent compliance status
+      description: Returns whether an agent is currently compliant with all applicable policies
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Compliance status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceStatus"
+        "404":
+          description: Agent not found
+
+components:
+  schemas:
+    AgentValidationRequest:
+      type: object
+      required: [agentId, name, version, capabilities]
+      properties:
+        agentId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        requestedPermissions:
+          type: array
+          items:
+            type: string
+        author:
+          type: string
+        description:
+          type: string
+
+    AgentValidationResponse:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approved, rejected, conditional]
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PolicyViolation"
+        conditions:
+          type: array
+          items:
+            type: string
+          description: Conditions that must be met for conditional approval
+        appliedConstraints:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentConstraint"
+          description: Constraints applied to this agent
+
+    PolicyViolation:
+      type: object
+      required: [policyId, policyName, reason]
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        policyName:
+          type: string
+        reason:
+          type: string
+        severity:
+          type: string
+          enum: [critical, major, minor]
+
+    AgentConstraint:
+      type: object
+      required: [id, name, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [rate-limit, scope-restriction, approval-required, time-window, resource-limit]
+        parameters:
+          type: object
+          description: Constraint-specific parameters
+        appliesTo:
+          type: string
+          description: "global or specific agent ID"
+
+    AgentAuditReport:
+      type: object
+      required: [agentId, action, timestamp, outcome]
+      properties:
+        agentId:
+          type: string
+          format: uuid
+        action:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+          enum: [success, failure, denied, escalated]
+        resourcesAccessed:
+          type: array
+          items:
+            type: string
+        duration:
+          type: integer
+          description: Execution time in milliseconds
+        details:
+          type: object
+
+    ComplianceStatus:
+      type: object
+      required: [agentId, compliant, checkedAt]
+      properties:
+        agentId:
+          type: string
+          format: uuid
+        compliant:
+          type: boolean
+        checkedAt:
+          type: string
+          format: date-time
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PolicyViolation"
+        nextReviewDate:
+          type: string
+          format: date-time

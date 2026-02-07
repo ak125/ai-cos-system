@@ -1,0 +1,248 @@
+openapi: 3.1.0
+info:
+  title: Platform ↔ Governance API
+  description: |
+    Contract between nestjs-remix-monorepo (platform) and governance-vault.
+    The platform checks governance rules before executing actions and receives policy updates.
+  version: 0.1.0
+  contact:
+    name: ai-cos-system
+
+paths:
+  /policies/active:
+    get:
+      summary: List active policies
+      description: Returns all currently active governance policies
+      parameters:
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [global, agents, platform]
+          description: Filter by policy scope
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [constraint, permission, requirement, prohibition]
+      responses:
+        "200":
+          description: List of active policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Policy"
+
+  /policies/{policyId}:
+    get:
+      summary: Get policy details
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Policy"
+        "404":
+          description: Policy not found
+
+  /validate:
+    post:
+      summary: Validate an action against governance rules
+      description: |
+        Checks whether a proposed action is allowed under current policies.
+        Returns approval, denial, or requirement for human review.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidationRequest"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+
+  /roles/{roleId}:
+    get:
+      summary: Get role permissions
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Role details with permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+        "404":
+          description: Role not found
+
+  /audit:
+    post:
+      summary: Submit an audit entry
+      description: Log an action for audit trail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuditEntry"
+      responses:
+        "201":
+          description: Audit entry recorded
+        "400":
+          description: Invalid audit entry
+
+components:
+  schemas:
+    Policy:
+      type: object
+      required: [id, name, type, scope, rule, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [constraint, permission, requirement, prohibition]
+        scope:
+          type: string
+          description: "global, agents, platform, or specific agent/resource ID"
+        rule:
+          $ref: "#/components/schemas/PolicyRule"
+        status:
+          type: string
+          enum: [draft, active, revoked]
+        metadata:
+          $ref: "#/components/schemas/PolicyMetadata"
+
+    PolicyRule:
+      type: object
+      required: [condition, action]
+      properties:
+        condition:
+          type: string
+          description: Expression that triggers this rule
+        action:
+          type: string
+          enum: [allow, deny, require-approval]
+        priority:
+          type: integer
+          default: 0
+          description: Higher priority rules take precedence
+
+    PolicyMetadata:
+      type: object
+      properties:
+        author:
+          type: string
+        rationale:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        effectiveDate:
+          type: string
+          format: date-time
+
+    ValidationRequest:
+      type: object
+      required: [actor, action, resource]
+      properties:
+        actor:
+          type: string
+          description: ID of the user or agent requesting the action
+        actorType:
+          type: string
+          enum: [human, agent, system]
+        action:
+          type: string
+          description: The action being requested
+        resource:
+          type: string
+          description: The target resource
+        context:
+          type: object
+          description: Additional context for rule evaluation
+
+    ValidationResponse:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approved, denied, requires-approval]
+        reason:
+          type: string
+          description: Human-readable explanation
+        appliedPolicies:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs of policies that influenced the decision
+        approvalWorkflow:
+          type: string
+          description: If requires-approval, the workflow to follow
+
+    Role:
+      type: object
+      required: [id, name, permissions]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        inheritsFrom:
+          type: array
+          items:
+            type: string
+          description: Parent roles this role inherits from
+
+    AuditEntry:
+      type: object
+      required: [actor, actorType, action, resource, outcome]
+      properties:
+        actor:
+          type: string
+        actorType:
+          type: string
+          enum: [human, agent, system]
+        action:
+          type: string
+        resource:
+          type: string
+        outcome:
+          type: string
+          enum: [success, failure, denied]
+        policyRef:
+          type: string
+          format: uuid
+        details:
+          type: object
+        timestamp:
+          type: string
+          format: date-time

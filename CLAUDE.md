@@ -14,14 +14,27 @@ This is not a standalone application — it is the **umbrella system** that ties
 ai-cos-system/                          # Central orchestration & system design
 │
 ├── CLAUDE.md                           # This file — global context for Claude Code
-├── docs/                               # System-wide documentation & architecture
-│   ├── architecture.md                 # Overall system design
-│   ├── integration-map.md              # How subsystems connect
-│   └── decisions/                      # ADRs (Architecture Decision Records)
+├── .gitignore                          # Git ignore rules
+│
+├── docs/                               # System-wide documentation
+│   ├── architecture.md                 # System layers, subsystem roles, scaling strategy
+│   ├── integration-map.md              # Dependency matrix, events, shared schemas
+│   ├── agent-lifecycle.md              # Agent stages: submit → validate → deploy → operate
+│   ├── governance-enforcement.md       # Policy types, enforcement points, audit trail
+│   └── decisions/                      # Architecture Decision Records
+│       ├── ADR-001-multi-repo-architecture.md
+│       └── ADR-002-ai-driven-company-model.md
+│
+├── specs/                              # OpenAPI contracts between subsystems
+│   ├── platform-agents.yaml            # nestjs-remix ↔ agent-submissions
+│   ├── platform-governance.yaml        # nestjs-remix ↔ governance-vault
+│   └── agents-governance.yaml          # agent-submissions ↔ governance-vault
 │
 ├── config/                             # Shared configuration & environment
-├── scripts/                            # Cross-project automation & orchestration
-└── specs/                              # API contracts & shared interfaces
+│   └── README.md                       # Config structure & conventions
+│
+└── scripts/                            # Cross-project automation
+    └── README.md                       # Script catalog & conventions
 ```
 
 ## Connected Repositories
@@ -96,13 +109,26 @@ Track major architectural and organizational decisions here:
 | 2026-02-07 | Adopt multi-repo structure with ai-cos-system as orchestrator | Separation of concerns between platform, agents, and governance |
 | 2026-02-07 | AI-driven company model | Organization operates with AI agents as primary workers, humans as strategic oversight |
 
+## Key Documentation
+
+| Document | What it covers |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | System layers, subsystem roles, tech stack, scaling phases |
+| [docs/integration-map.md](docs/integration-map.md) | Dependency matrix, API flows, event catalog, shared schemas |
+| [docs/agent-lifecycle.md](docs/agent-lifecycle.md) | Full agent journey: submit → validate → register → deploy → monitor |
+| [docs/governance-enforcement.md](docs/governance-enforcement.md) | Policy types, enforcement model, conflict resolution, audit trail |
+| [docs/decisions/ADR-001](docs/decisions/ADR-001-multi-repo-architecture.md) | Why multi-repo with orchestrator |
+| [docs/decisions/ADR-002](docs/decisions/ADR-002-ai-driven-company-model.md) | AI-first, human-governed operating model |
+
 ## Roadmap Priorities
 
-- [ ] Define integration contracts between the 3 subsystems
+- [x] Define integration contracts between the 3 subsystems
+- [x] Document agent lifecycle (submission -> validation -> deployment)
+- [x] Establish governance-to-platform enforcement pipeline
 - [ ] Set up shared CI/CD pipeline orchestration
-- [ ] Document agent lifecycle (submission -> validation -> deployment)
-- [ ] Establish governance-to-platform enforcement pipeline
 - [ ] Create cross-repo automation scripts
+- [ ] Implement service health checks
+- [ ] Build shared TypeScript types package from OpenAPI specs
 
 ## Notes
 

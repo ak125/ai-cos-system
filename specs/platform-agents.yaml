@@ -1,0 +1,238 @@
+openapi: 3.1.0
+info:
+  title: Platform ↔ Agent Registry API
+  description: |
+    Contract between nestjs-remix-monorepo (platform) and agent-submissions (registry).
+    The platform uses this API to discover, invoke, and monitor AI agents.
+  version: 0.1.0
+  contact:
+    name: ai-cos-system
+
+paths:
+  /agents/available:
+    get:
+      summary: List available agents
+      description: Returns all deployed agents the platform can invoke
+      parameters:
+        - name: capability
+          in: query
+          schema:
+            type: string
+          description: Filter by agent capability
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [deployed, suspended]
+          description: Filter by agent status
+      responses:
+        "200":
+          description: List of available agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentSummary"
+
+  /agents/{agentId}:
+    get:
+      summary: Get agent details
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "404":
+          description: Agent not found
+
+  /agents/{agentId}/invoke:
+    post:
+      summary: Invoke an agent
+      description: Trigger an agent to execute a task
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvocationRequest"
+      responses:
+        "202":
+          description: Agent invocation accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvocationResponse"
+        "403":
+          description: Agent invocation denied by governance
+        "404":
+          description: Agent not found
+
+  /agents/{agentId}/logs:
+    get:
+      summary: Get agent execution logs
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Agent execution logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExecutionLog"
+
+components:
+  schemas:
+    AgentSummary:
+      type: object
+      required: [id, name, version, status, capabilities]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+          enum: [deployed, suspended]
+        capabilities:
+          type: array
+          items:
+            type: string
+
+    Agent:
+      type: object
+      required: [id, name, version, status, capabilities, constraints, metadata]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+          enum: [submitted, validating, approved, rejected, deployed, suspended]
+        capabilities:
+          type: array
+          items:
+            type: string
+        constraints:
+          $ref: "#/components/schemas/AgentConstraints"
+        metadata:
+          $ref: "#/components/schemas/AgentMetadata"
+
+    AgentConstraints:
+      type: object
+      properties:
+        maxExecutionTime:
+          type: integer
+          description: Maximum execution time in milliseconds
+        allowedActions:
+          type: array
+          items:
+            type: string
+        requiredApprovals:
+          type: integer
+          default: 0
+
+    AgentMetadata:
+      type: object
+      properties:
+        author:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InvocationRequest:
+      type: object
+      required: [task]
+      properties:
+        task:
+          type: string
+          description: Description of the task for the agent
+        parameters:
+          type: object
+          description: Task-specific parameters
+        callbackUrl:
+          type: string
+          format: uri
+          description: Webhook URL for async result delivery
+        requestedBy:
+          type: string
+          description: ID of the user or agent making the request
+
+    InvocationResponse:
+      type: object
+      required: [invocationId, status]
+      properties:
+        invocationId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [accepted, queued, denied]
+        estimatedCompletion:
+          type: string
+          format: date-time
+
+    ExecutionLog:
+      type: object
+      required: [id, timestamp, action, outcome]
+      properties:
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        action:
+          type: string
+        outcome:
+          type: string
+          enum: [success, failure, denied]
+        duration:
+          type: integer
+          description: Execution time in milliseconds
+        details:
+          type: object

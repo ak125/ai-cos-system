@@ -1,0 +1,24 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node (if applicable)
+node_modules/
+dist/
+build/
+
+# Temporary
+tmp/
+*.tmp
+*.log
