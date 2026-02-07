@@ -147,6 +147,7 @@ Track major architectural and organizational decisions here:
 | [docs/governance-enforcement.md](docs/governance-enforcement.md) | Policy types, enforcement model, conflict resolution, audit trail |
 | [docs/decisions/ADR-001](docs/decisions/ADR-001-multi-repo-architecture.md) | Why multi-repo with orchestrator |
 | [docs/decisions/ADR-002](docs/decisions/ADR-002-ai-driven-company-model.md) | AI-first, human-governed operating model |
+| [docs/rag-deployment.md](docs/rag-deployment.md) | RAG stack deployment, field mapping, safety controls, rollback |
 
 ## Roadmap Priorities
 
@@ -157,7 +158,7 @@ Track major architectural and organizational decisions here:
 - [ ] Set up shared CI/CD pipeline orchestration
 - [ ] Create cross-repo automation scripts
 - [ ] Implement service health checks
-- [ ] Connect RAG to live platform (KG ↔ RAG sync, diagnostic integration)
+- [x] Connect RAG to live platform — Phase 0 done (feature flag, field mapping, ChatWidget mounted)
 - [ ] Build shared types from OpenAPI specs (TypeScript for platform, Python for RAG)
 
 ## Notes
