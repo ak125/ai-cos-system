@@ -148,6 +148,7 @@ Track major architectural and organizational decisions here:
 | [docs/decisions/ADR-001](docs/decisions/ADR-001-multi-repo-architecture.md) | Why multi-repo with orchestrator |
 | [docs/decisions/ADR-002](docs/decisions/ADR-002-ai-driven-company-model.md) | AI-first, human-governed operating model |
 | [docs/rag-deployment.md](docs/rag-deployment.md) | RAG stack deployment, field mapping, safety controls, rollback |
+| [docs/roadmap.md](docs/roadmap.md) | Roadmap evolutive Phase 0→4 avec checklist |
 
 ## Roadmap Priorities
 
