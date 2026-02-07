@@ -145,15 +145,40 @@ agent-submissions/
 
 ### 3.4 governance-vault (Governance & Compliance)
 
-**Role:** The rule book — defines what the company and its agents can and cannot do.
+**Role:** The rule book — an **Obsidian vault** that defines what the company and its agents can and cannot do.
+
+**Repository structure:**
+```
+governance-vault/                    # Obsidian vault
+├── 00-index/                        # Maps of Content (MOC)
+├── ...                              # 11 directories total
+├── scripts/                         # Automation
+│   ├── check-orphans.sh             # Find orphan documents
+│   ├── sync-canon.sh                # Sync canonical files
+│   └── ...                          # 5 scripts total
+└── CLAUDE.md                        # Claude Code context
+```
+
+**Governance authority rules (RULE-H0 to H6):**
+- Human authority hierarchy, zero-trust agent model
+- Every agent action must be validated against these rules
+
+**Vault rules (R-Vault-01 to 04):**
+- Canon management, orphan detection, signatures, CI validation
+
+**Technical rules (R1-R7):**
+- Enforces 3-tier pattern, Supabase-only, Redis sessions, Zod validation, HMAC signatures
+- These rules apply to `nestjs-remix-monorepo` and all subsystems
+
+**Document conventions:** ADR, DEC (decisions), incidents, agent specs, MOC (Maps of Content)
 
 | Concern | Description |
 |---|---|
-| Policies | Company-wide rules codified as enforceable specifications |
-| Decision Records | Logged decisions with context, rationale, and outcomes |
-| Compliance | Regulatory requirements, audit trails, reporting |
-| Org Structure | Roles, permissions, hierarchies, delegation rules |
-| Agent Constraints | Boundaries and permissions for AI agent behavior |
+| Policies | Company-wide rules codified as Obsidian documents (RULE-H*, R-Vault-*, R1-R7) |
+| Decision Records | ADRs and DEC documents with context, rationale, and outcomes |
+| Agent Constraints | Zero-trust model — agents must prove compliance before action |
+| Technical Standards | Enforced coding rules (3-tier, Supabase SDK, Zod, HMAC) |
+| Automation | 5 scripts for vault integrity (orphans, sync, CI) |
 
 ### 3.5 automecanik-rag (Knowledge & RAG)
 
