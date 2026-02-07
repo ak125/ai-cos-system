@@ -10,7 +10,8 @@ This is not a standalone application — it is the **umbrella system** that ties
 
 ## Business Context
 
-**Automecanik** is a mature automotive parts e-commerce platform:
+**Automecanik** is a **live, production** automotive parts e-commerce platform:
+- **Site in production** — all code lives in `nestjs-remix-monorepo`
 - **3.5M+ parts** in catalog across 992 brands
 - **146M+ vehicle-part compatibility** relations
 - **48,918 vehicle motorizations** across 117 brands and 5,745 models
@@ -55,7 +56,7 @@ ai-cos-system/                          # Central orchestration & system design
 
 | Repository | Role | Description |
 |---|---|---|
-| **nestjs-remix-monorepo** | Core Platform | Main tech stack — NestJS backend + Remix frontend. Handles product, APIs, UI, and business logic |
+| **nestjs-remix-monorepo** | Core Platform | **IN PRODUCTION** — NestJS backend + Remix frontend. The live Automecanik e-commerce site with all business logic |
 | **agent-submissions** | AI Agent Registry | Manages AI agent definitions, submissions, validation, and deployment workflows |
 | **governance-vault** | Governance & Rules | Company governance framework — policies, decision records, compliance rules, and organizational structure |
 | **automecanik-rag** | Knowledge & RAG | Retrieval-Augmented Generation system for automotive/mechanical domain knowledge |
@@ -75,9 +76,9 @@ ai-cos-system/                          # Central orchestration & system design
 │ nestjs-  │ │   agent-    │ │ governance-│ │ automecanik- │
 │ remix-   │ │ submissions │ │ vault      │ │ rag          │
 │ monorepo │ │             │ │            │ │              │
-│          │ │ AI agents   │ │ Policies/  │ │ Knowledge/   │
-│ Product/ │ │ registry &  │ │ Rules/     │ │ RAG/         │
-│ APIs/UI  │ │ workflows   │ │ Compliance │ │ Automotive   │
+│ LIVE     │ │ AI agents   │ │ Policies/  │ │ Knowledge/   │
+│ PROD     │ │ registry &  │ │ Rules/     │ │ RAG/         │
+│ SITE     │ │ workflows   │ │ Compliance │ │ Automotive   │
 └──────────┘ └─────────────┘ └────────────┘ └──────────────┘
 ```
 

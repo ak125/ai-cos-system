@@ -4,7 +4,8 @@
 
 AI-COS (AI Company Operating System) is the foundational infrastructure for running **Automecanik** as an AI-driven company. The system treats AI agents as first-class workers and codifies governance, business logic, and operations into an automated, auditable platform.
 
-**Automecanik** is a mature automotive parts e-commerce platform with:
+**Automecanik** is a **live, production** automotive parts e-commerce platform with:
+- **Site in production** — all application code in `nestjs-remix-monorepo` (NestJS + Remix)
 - **3.5M+ parts** in catalog, **146M+ vehicle-part compatibility relations**
 - **59K+ customers**, **1.6K+ orders**, migrated from a legacy MySQL system
 - A sophisticated **SEO engine** (80+ tables, 321K pages, keyword system, quality scoring)
@@ -55,9 +56,9 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 | Automation | Cross-repo scripts, CI/CD orchestration, deployment coordination |
 | Documentation | Global system documentation, onboarding guides |
 
-### 3.2 nestjs-remix-monorepo (Core Platform)
+### 3.2 nestjs-remix-monorepo (Core Platform) — IN PRODUCTION
 
-**Role:** The product — everything user-facing and business-critical for the Automecanik e-commerce platform.
+**Role:** The live Automecanik e-commerce site — everything user-facing and business-critical. This is the **existing, running application** that all other subsystems extend.
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -246,28 +247,27 @@ Developer/AI submits agent
 
 ## 8. Scaling Strategy
 
-**Phase 1 — Foundation (current)**
+**Phase 1 — Foundation — DONE**
+- [x] Build core platform (NestJS + Remix) — **IN PRODUCTION** on `nestjs-remix-monorepo`
 - [x] Migrate MySQL → PostgreSQL (Supabase) — **DONE** (200+ tables migrated)
 - [x] Build catalog/SEO data layer — **DONE** (3.5M parts, 321K SEO pages)
 - [x] Build import pipeline (stg → norm → xref) — **DONE** (CQRS pattern)
 - [x] Build Knowledge Graph — **DONE** (83 nodes, 72 edges, diagnostic engine)
 - [x] Build diagnostic symptom system — **DONE** (31 symptoms, 35 families)
 - [x] Establish repo structure and contracts — **DONE**
-- [ ] Build core platform (NestJS + Remix) — on `nestjs-remix-monorepo`
+
+**Phase 2 — AI Augmentation (current)**
+- [ ] Scale RAG from 5 entries to full knowledge base (blog content, repair guides, KG data)
+- [ ] Integrate diagnostic engine with RAG pipeline
 - [ ] Define governance framework — on `governance-vault`
 - [ ] Set up first AI agents — on `agent-submissions`
+- [ ] Connect subsystems to the live platform via defined contracts
 
-**Phase 2 — Integration**
-- Connect all 4 subsystems via defined contracts
-- Scale RAG from 5 entries to full knowledge base (blog content, repair guides, KG data)
-- Integrate diagnostic engine with RAG pipeline
-- Implement event-driven communication
-- Automated governance enforcement
-- CI/CD across all repos
-
-**Phase 3 — Scale**
+**Phase 3 — Full AI Operations**
 - Multi-agent orchestration
+- Automated governance enforcement
+- Event-driven communication across all subsystems
+- CI/CD across all repos
 - Real-time monitoring and observability
-- Auto-scaling infrastructure
-- Advanced compliance and audit tooling
 - SEO generation fully AI-driven
+- Auto-scaling infrastructure
