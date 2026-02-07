@@ -4,9 +4,21 @@ This file provides guidance to Claude Code when working in this repository.
 
 ## Project Overview
 
-**ai-cos-system** (AI Company Operating System) is the central orchestration layer for an **AI-driven company**. It coordinates and connects all subsystems that power the organization's operations, governance, and development infrastructure.
+**ai-cos-system** (AI Company Operating System) is the central orchestration layer for **Automecanik**, an **AI-driven automotive parts e-commerce company**. It coordinates and connects all subsystems that power the organization's operations, governance, and development infrastructure.
 
 This is not a standalone application — it is the **umbrella system** that ties together the company's core repositories and ensures they work as a unified platform.
+
+## Business Context
+
+**Automecanik** is a mature automotive parts e-commerce platform:
+- **3.5M+ parts** in catalog across 992 brands
+- **146M+ vehicle-part compatibility** relations
+- **48,918 vehicle motorizations** across 117 brands and 5,745 models
+- **59K+ customers**, **1.6K+ orders**
+- **321K SEO pages** with a sophisticated 80+ table SEO engine
+- **Knowledge Graph** (83 nodes, 72 edges) for automotive diagnostics
+- **Data hosted on Supabase** (PostgreSQL) — project `massdoc`, ~100 GB
+- **Migrated from legacy MySQL** to PostgreSQL with full data pipeline
 
 ## Ecosystem Architecture
 
@@ -21,6 +33,7 @@ ai-cos-system/                          # Central orchestration & system design
 │   ├── integration-map.md              # Dependency matrix, events, shared schemas
 │   ├── agent-lifecycle.md              # Agent stages: submit → validate → deploy → operate
 │   ├── governance-enforcement.md       # Policy types, enforcement points, audit trail
+│   ├── database-architecture.md       # Supabase/PostgreSQL schema (200+ tables)
 │   └── decisions/                      # Architecture Decision Records
 │       ├── ADR-001-multi-repo-architecture.md
 │       └── ADR-002-ai-driven-company-model.md
@@ -110,12 +123,15 @@ Track major architectural and organizational decisions here:
 |---|---|---|
 | 2026-02-07 | Adopt multi-repo structure with ai-cos-system as orchestrator | Separation of concerns between platform, agents, and governance |
 | 2026-02-07 | AI-driven company model | Organization operates with AI agents as primary workers, humans as strategic oversight |
+| 2026-02-07 | Supabase as database platform | PostgreSQL on Supabase Pro (project massdoc), migrated from legacy MySQL |
+| 2026-02-07 | Add automecanik-rag as 4th subsystem | RAG + Knowledge Graph for automotive domain knowledge and diagnostics |
 
 ## Key Documentation
 
 | Document | What it covers |
 |---|---|
 | [docs/architecture.md](docs/architecture.md) | System layers, subsystem roles, tech stack, scaling phases |
+| [docs/database-architecture.md](docs/database-architecture.md) | Supabase schema: 200+ tables, data domains, naming conventions |
 | [docs/integration-map.md](docs/integration-map.md) | Dependency matrix, API flows, event catalog, shared schemas |
 | [docs/agent-lifecycle.md](docs/agent-lifecycle.md) | Full agent journey: submit → validate → register → deploy → monitor |
 | [docs/governance-enforcement.md](docs/governance-enforcement.md) | Policy types, enforcement model, conflict resolution, audit trail |

@@ -2,7 +2,15 @@
 
 ## 1. Vision
 
-AI-COS (AI Company Operating System) is the foundational infrastructure for running an AI-driven company. The system treats AI agents as first-class workers and codifies governance, business logic, and operations into an automated, auditable platform.
+AI-COS (AI Company Operating System) is the foundational infrastructure for running **Automecanik** as an AI-driven company. The system treats AI agents as first-class workers and codifies governance, business logic, and operations into an automated, auditable platform.
+
+**Automecanik** is a mature automotive parts e-commerce platform with:
+- **3.5M+ parts** in catalog, **146M+ vehicle-part compatibility relations**
+- **59K+ customers**, **1.6K+ orders**, migrated from a legacy MySQL system
+- A sophisticated **SEO engine** (80+ tables, 321K pages, keyword system, quality scoring)
+- A **Knowledge Graph** for automotive diagnostics
+- An **import pipeline** with staging → normalization → cross-reference layers (CQRS pattern)
+- All data hosted on **Supabase** (PostgreSQL) — project `massdoc`
 
 ## 2. System Layers
 
@@ -49,15 +57,22 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 
 ### 3.2 nestjs-remix-monorepo (Core Platform)
 
-**Role:** The product — everything user-facing and business-critical.
+**Role:** The product — everything user-facing and business-critical for the Automecanik e-commerce platform.
 
 | Layer | Technology | Purpose |
 |---|---|---|
 | Backend API | NestJS | REST/GraphQL APIs, business logic, data persistence |
 | Frontend | Remix | SSR web application, UI components, user experience |
-| Database | TBD | Data storage, migrations, seeding |
-| Auth | TBD | Authentication, authorization, role management |
+| Database | Supabase (PostgreSQL) | 200+ tables, 3.5M parts, vehicle catalog, orders |
+| Auth | Supabase Auth | Authentication, authorization, role management |
 | Queue/Events | TBD | Async processing, event-driven workflows |
+
+**Key data domains served by the platform:**
+- Parts catalog (`pieces`, `pieces_criteria`, `pieces_relation_type`)
+- Vehicle reference (`auto_marque`, `auto_modele`, `auto_type`)
+- E-commerce (`___xtr_customer`, `___xtr_order`, `pieces_price`)
+- SEO pages (`__seo_page`, `__seo_keywords`, `__seo_gamme`)
+- Read Model / CQRS (`rm_listing`, `rm_product`, `rm_facets`)
 
 ### 3.3 agent-submissions (AI Agent Registry)
 
@@ -94,6 +109,13 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 | RAG Pipeline | Retrieve relevant context and augment LLM responses with domain knowledge |
 | Query API | Expose knowledge search and Q&A endpoints to the platform and agents |
 | Knowledge Management | Version, update, and curate the knowledge base over time |
+
+**Existing foundation in Supabase:**
+- `__rag_knowledge` — 5 entries (seed data)
+- `kg_nodes` (83), `kg_edges` (72) — Knowledge Graph for diagnostic reasoning
+- `kg_reasoning_cache`, `kg_safety_triggers` — Diagnostic inference engine
+- `__diag_symptoms` (31), `__diag_symptom_family` (35) — Symptom-to-part mapping
+- `kg_rag_mapping`, `kg_rag_sync_log` — KG ↔ RAG synchronization
 
 ## 4. Data Flow Patterns
 
@@ -209,27 +231,36 @@ Developer/AI submits agent
 | Backend Framework | NestJS | Active |
 | Frontend Framework | Remix | Active |
 | Language | TypeScript | Active |
+| Database | **Supabase (PostgreSQL)** | **Active** — project `massdoc`, 200+ tables |
+| Database Hosting | **Supabase Pro** (ak125's Org) | **Active** |
+| Vector Database | **pgvector** (via Supabase) | Available — native PostgreSQL extension |
+| Knowledge Graph | **PostgreSQL** (kg_* tables) | **Active** — 83 nodes, 72 edges |
+| RAG Foundation | **PostgreSQL** (__rag_knowledge, kg_rag_*) | **Seeded** — 5 entries |
 | Package Manager | TBD (npm/pnpm/yarn) | To decide |
-| Database | TBD | To decide |
 | Cache | TBD | To decide |
 | Message Queue | TBD | To decide |
 | CI/CD | TBD (GitHub Actions likely) | To decide |
 | Hosting | TBD | To decide |
-| Vector Database | TBD (Pinecone/Weaviate/pgvector) | To decide |
 | Embeddings | TBD (OpenAI/Cohere/local) | To decide |
 | Monitoring | TBD | To decide |
 
 ## 8. Scaling Strategy
 
 **Phase 1 — Foundation (current)**
-- Establish repo structure and contracts
-- Build core platform (NestJS + Remix)
-- Define governance framework
-- Set up first AI agents
+- [x] Migrate MySQL → PostgreSQL (Supabase) — **DONE** (200+ tables migrated)
+- [x] Build catalog/SEO data layer — **DONE** (3.5M parts, 321K SEO pages)
+- [x] Build import pipeline (stg → norm → xref) — **DONE** (CQRS pattern)
+- [x] Build Knowledge Graph — **DONE** (83 nodes, 72 edges, diagnostic engine)
+- [x] Build diagnostic symptom system — **DONE** (31 symptoms, 35 families)
+- [x] Establish repo structure and contracts — **DONE**
+- [ ] Build core platform (NestJS + Remix) — on `nestjs-remix-monorepo`
+- [ ] Define governance framework — on `governance-vault`
+- [ ] Set up first AI agents — on `agent-submissions`
 
 **Phase 2 — Integration**
 - Connect all 4 subsystems via defined contracts
-- Integrate RAG knowledge pipeline with platform and agents
+- Scale RAG from 5 entries to full knowledge base (blog content, repair guides, KG data)
+- Integrate diagnostic engine with RAG pipeline
 - Implement event-driven communication
 - Automated governance enforcement
 - CI/CD across all repos
@@ -239,3 +270,4 @@ Developer/AI submits agent
 - Real-time monitoring and observability
 - Auto-scaling infrastructure
 - Advanced compliance and audit tooling
+- SEO generation fully AI-driven
