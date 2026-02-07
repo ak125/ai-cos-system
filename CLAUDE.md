@@ -56,7 +56,7 @@ ai-cos-system/                          # Central orchestration & system design
 
 | Repository | Role | Description |
 |---|---|---|
-| **nestjs-remix-monorepo** | Core Platform | **IN PRODUCTION** — NestJS backend + Remix frontend. The live Automecanik e-commerce site with all business logic |
+| **nestjs-remix-monorepo** | Core Platform | NestJS backend + Remix frontend. Development repo → **preprod** → **production** (live Automecanik site) |
 | **agent-submissions** | AI Agent Registry | Manages AI agent definitions, submissions, validation, and deployment workflows |
 | **governance-vault** | Governance & Rules | Company governance framework — policies, decision records, compliance rules, and organizational structure |
 | **automecanik-rag** | Knowledge & RAG | Retrieval-Augmented Generation system for automotive/mechanical domain knowledge |

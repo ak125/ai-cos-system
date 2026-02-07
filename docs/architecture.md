@@ -60,6 +60,11 @@ AI-COS (AI Company Operating System) is the foundational infrastructure for runn
 
 **Role:** The live Automecanik e-commerce site — everything user-facing and business-critical. This is the **existing, running application** that all other subsystems extend.
 
+**Deployment pipeline:**
+```
+nestjs-remix-monorepo (dev) ──► preprod ──► prod
+```
+
 | Layer | Technology | Purpose |
 |---|---|---|
 | Backend API | NestJS | REST/GraphQL APIs, business logic, data persistence |

@@ -229,11 +229,24 @@ All subsystems agree on these core entity shapes (defined in `specs/schemas/`):
 
 ## Environment Strategy
 
+### Deployment Pipeline
+
+```
+nestjs-remix-monorepo (dev) ──► preprod ──► prod (live site)
+```
+
 | Environment | Purpose | Deployment |
 |---|---|---|
-| `development` | Local dev, feature branches | Local / Docker Compose |
-| `staging` | Integration testing, pre-release | Cloud (single instance) |
-| `production` | Live system | Cloud (scaled) |
+| `development` | Feature development, code on `nestjs-remix-monorepo` | Local / Docker Compose |
+| `preprod` | Validation before production — QA, integration tests | Cloud (mirrors prod) |
+| `production` | Live Automecanik site — real customers, real orders | Cloud (scaled) |
+
+### Environment Rules
+
+- **dev → preprod**: Automatic or manual push after CI passes
+- **preprod → prod**: Manual promotion after validation
+- **Never skip preprod** — all changes must pass through preprod before prod
+- **Database**: Supabase `massdoc` is the production database — preprod should use a separate project or branch
 
 Each subsystem maintains its own deployment but shares:
 - Database connection patterns (defined in `config/`)
