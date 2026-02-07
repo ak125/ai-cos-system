@@ -122,13 +122,26 @@ nestjs-remix-monorepo/
 
 **Role:** Manage the lifecycle of AI agents that operate within the company.
 
+**Repository structure:**
+```
+agent-submissions/
+├── bundles/               # Bundle directories with signed patches
+├── logs/                  # Agent execution logs
+├── constraints.json       # Global governance rules
+├── evidence.json          # Validation evidence template
+├── README.md              # Workflow documentation (French)
+└── CLAUDE.md              # Claude Code context
+```
+
+**Workflow model:** Bundle-based submission with signed patches — agents are submitted as bundles containing code patches, metadata, and evidence. Each bundle goes through validation against `constraints.json` before approval.
+
 | Phase | Description |
 |---|---|
-| Submission | Agent definitions are submitted with metadata, capabilities, and constraints |
-| Validation | Agents are tested against governance rules and safety checks |
-| Registry | Approved agents are cataloged with versioning |
-| Deployment | Agents are activated and assigned to workflows |
-| Monitoring | Running agents are tracked, logged, and auditable |
+| Submission | Agent bundles submitted with signed patches, metadata, and evidence |
+| Validation | Bundles tested against governance rules (`constraints.json`) and safety checks |
+| Registry | Approved agents cataloged with versioning |
+| Deployment | Agents activated and assigned to workflows |
+| Monitoring | Running agents tracked via `logs/`, auditable |
 
 ### 3.4 governance-vault (Governance & Compliance)
 
