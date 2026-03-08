@@ -60,7 +60,7 @@ ai-cos-system/                          # Central orchestration & system design
 
 | Repository | Role | Description |
 |---|---|---|
-| **nestjs-remix-monorepo** | Core Platform | **TypeScript** — NestJS 10 (38 modules) + Remix 2.15 (191 routes) + React 18. Supabase, Redis, Turborepo, Docker+Caddy. Dev → preprod → **production** (live site) |
+| **nestjs-remix-monorepo** | Core Platform | **TypeScript** — NestJS 10 (40 modules) + Remix 2.15 (158 routes) + React 18. Supabase, Redis, Turborepo, Docker+Caddy. Dev → preprod → **production** (live site) |
 | **agent-submissions** | AI Agent Registry | Bundle-based agent submission with signed patches, `constraints.json`, `evidence.json`. Validation against governance rules before deployment |
 | **governance-vault** | Governance & Rules | **Obsidian vault** — RULE-H0 to H6 (human authority), R-Vault-01 to 04 (vault rules), R1-R7 (technical rules). 5 automation scripts, ADR/DEC conventions |
 | **automecanik-rag** | Knowledge & RAG | **Python 3.11** — FastAPI + Weaviate + Claude LLM + LangGraph. 8,600 lines, 352 knowledge docs, Docker multi-service stack, admin UI, golden tests |
@@ -85,6 +85,22 @@ ai-cos-system/                          # Central orchestration & system design
 │ SITE     │ │ workflows   │ │ Compliance │ │ Automotive   │
 └──────────┘ └─────────────┘ └────────────┘ └──────────────┘
 ```
+
+## Infrastructure Zones (ADR-012)
+
+4 deployment zones — see [ADR-012](https://github.com/ak125/governance-vault/blob/main/02-decisions/adr/ADR-012-aicos-vps-architecture.md):
+
+| Zone | Server | Role | Access |
+|---|---|---|---|
+| **local** (DEV) | `46.224.118.55` | Development, Claude Code, local tests | Read/Write |
+| **principal_vps** (PROD) | `49.12.233.2` | Production — auto-deploy via `git push main` | Read/Write |
+| **aicos_vps** (AI-COS) | `178.104.1.118` | READ-ONLY observatoire — dashboard, health monitoring | READ ONLY |
+| **external** | — | External services: Supabase, GitHub, Anthropic API | External |
+
+**AI-COS VPS (`/opt/aicos`):**
+- Dashboard React Router 7 — monitoring Supabase, Docker, agents
+- MCP configuré : Supabase + GitHub + Filesystem (`/opt/aicos/.mcp.json`, hors git)
+- Template sans secrets : `config/mcp.template.json`
 
 ## AI-Driven Company Principles
 

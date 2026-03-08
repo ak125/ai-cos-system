@@ -70,12 +70,12 @@ Push sur main = déploiement automatique
 **Monorepo structure:**
 ```
 nestjs-remix-monorepo/
-├── backend/               # NestJS API (38 modules métier)
+├── backend/               # NestJS API (40 modules métier)
 │   ├── src/modules/       # Business modules
 │   ├── src/auth/          # Authentication
 │   ├── src/database/      # Supabase data services
 │   └── supabase/migrations/ # SQL migrations
-├── frontend/              # Remix SSR (191 routes)
+├── frontend/              # Remix SSR (158 routes)
 │   ├── app/components/    # React components
 │   ├── app/routes/        # Page routes
 │   └── app/services/      # API services
@@ -96,8 +96,8 @@ nestjs-remix-monorepo/
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Backend API | NestJS 10 (38 modules) | REST APIs, business logic, Supabase data services |
-| Frontend | Remix 2.15 + React 18 | SSR, 191 routes, React Query + Zustand |
+| Backend API | NestJS 10 (40 modules) | REST APIs, business logic, Supabase data services |
+| Frontend | Remix 2.15 + React 18 | SSR, 158 routes, React Query + Zustand |
 | UI Library | Radix UI + Tailwind (shadcn/ui) | @fafa/ui component library |
 | Database | Supabase (PostgreSQL) | 200+ tables, direct SDK (no Prisma) |
 | Sessions | Redis | Server-side session management |
@@ -379,6 +379,7 @@ Developer/AI submits agent
 | Knowledge Graph | **PostgreSQL** (kg_* tables) | **Active** — 83 nodes, 72 edges |
 | KG ↔ RAG Sync | **PostgreSQL** (kg_rag_*) | **Active** |
 | Monitoring | TBD | To decide |
+| AI-COS VPS | **React Router 7 Dashboard** | READ-ONLY observatoire (178.104.1.118) — ADR-012 |
 
 ## 8. Scaling Strategy
 
@@ -395,6 +396,7 @@ Developer/AI submits agent
 - [x] Build RAG system — **DONE** (Python 3.11/FastAPI, 8,600 lines, 352 knowledge docs, Weaviate + Claude + LangGraph)
 - [x] Define governance framework — **DONE** on `governance-vault` (Obsidian vault, RULE-H0 to H6, R1-R7)
 - [x] Set up agent submission workflow — **DONE** on `agent-submissions` (bundle-based, signed patches)
+- [x] Deploy AI-COS VPS — **DONE** (178.104.1.118, READ-ONLY observatoire, ADR-012, MCP configuré)
 - [ ] Integrate diagnostic engine with RAG pipeline (KG ↔ RAG sync)
 - [ ] Connect subsystems to the live platform via defined contracts
 - [ ] Deploy RAG alongside production platform
