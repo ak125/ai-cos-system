@@ -1,18 +1,22 @@
 # Roadmap Evolutive — Automecanik AI Platform
 
 > Document vivant. Cocher chaque tache terminee. Suivre l'ordre des phases.
-> Derniere mise a jour : 2026-02-07
+> Derniere mise a jour : 2026-03-09
 
 ## Etat actuel
 
 | Element | Statut |
 |---|---|
-| Site e-commerce | LIVE en production (NestJS + Remix) |
+| Site e-commerce | LIVE en production (NestJS 40 modules + Remix 158 routes) |
 | RAG (automecanik-rag) | DEV uniquement, pas connecte a la prod |
 | Modules AI (AiContent, KG, RagProxy) | Desactives depuis P0.2 (2026-02-02) |
 | ChatWidget | Code pret, pas monte dans le layout |
 | generate_node (Claude LLM) | Placeholder, pas d'appel reel |
 | Knowledge docs | 352 fichiers, non indexes dans Weaviate prod |
+| AI-COS VPS (observatoire) | LIVE — Dashboard React Router, ADR-012, zone aicos_vps |
+| Documentation audit | TERMINE — 2026-03-08 (40 modules, 158 routes, REG-001 v2.1.0) |
+| Company orgchart | TERMINE — 2026-03-09 (88 agents, Mermaid 3 vues, company-orgchart.md) |
+| ADR-011 Phase A (fiches agents) | TERMINE — toutes fiches mises a jour vers Claude API |
 
 ---
 
@@ -147,7 +151,8 @@
 - [ ] Les deux repos importent les types generes
 
 ### 4.2 Scripts cross-repo
-- [ ] Script de health-check global (NestJS + RAG + Weaviate + Redis + Supabase)
+- [x] Script de health-check global (NestJS + RAG + Weaviate + Supabase + GitHub) — health-check.sh
+- [x] Script de rapport d'etat ecosysteme — status-report.sh
 - [ ] Script de deploiement coordonne
 - [ ] Script de rollback automatique
 
