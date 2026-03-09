@@ -165,6 +165,7 @@ Track major architectural and organizational decisions here:
 | [docs/decisions/ADR-002](docs/decisions/ADR-002-ai-driven-company-model.md) | AI-first, human-governed operating model |
 | [docs/rag-deployment.md](docs/rag-deployment.md) | RAG stack deployment, field mapping, safety controls, rollback |
 | [docs/roadmap.md](docs/roadmap.md) | Roadmap evolutive Phase 0→4 avec checklist |
+| [docs/company-orgchart.md](docs/company-orgchart.md) | Organigramme complet — hiérarchie C-Level, 6 domaines, 88 agents (Mermaid) |
 
 ## Roadmap Priorities
 
