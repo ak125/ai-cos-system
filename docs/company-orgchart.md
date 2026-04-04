@@ -169,8 +169,16 @@ flowchart TD
     CMO --> MKT_DIR["IA-Marketing Director\nLead Marketing Squad\n🔴 v3.9.0"]
 
     SEO_LEAD --> SEO_MASTER["IA-SEO Master\nLead SEO Squad\n🔴 v3.9.0"]
-    SEO_MASTER --> SEO_SENTINEL["SEO Sentinel\nVeille SEO\n🟡"]
-    SEO_LEAD --> SEO_EXEC["seo-content\nseo-canonical\nseo-sitemap\nseo-vlevel 🟡"]
+
+    SEO_MASTER --> KP_LEAD["agent.seo.kp.lead\nKP Lead (7 agents)\n🔴"]
+    SEO_MASTER --> CONTENT_LEAD["agent.seo.content.lead\nContent Lead (11 agents)\n🔴"]
+    SEO_MASTER --> QA_LEAD["agent.seo.qa.lead\nQA Lead (7 agents)\n🔴"]
+    SEO_MASTER --> EXEC_LEAD["agent.seo.exec.lead\nExec Lead (6 agents)\n🔴"]
+
+    KP_LEAD --> KP_AGENTS["keyword-planner (r1/r4/r6)\nresearch-agent\nbrief-enricher\nseo-keyword-expert\nserp-analyzer"]
+    CONTENT_LEAD --> CONTENT_AGENTS["content-batch (r1/r4/r6)\nconseil-batch\nimage-prompt (r3/r6)\nseo-content-architect\ncontent-refresh\nvideo-execution"]
+    QA_LEAD --> QA_AGENTS["seo-monitor-*\nseo-audit-scheduler\ninterpolation-monitor\nqa.seo-tech\nSEO Sentinel 🟡"]
+    EXEC_LEAD --> EXEC_AGENTS["seo-vlevel\nseo-sitemap\nseo-canonical 🟡\nsitemap-delta\npipeline-chain-poller\na9_seo"]
 
     MKT_DIR --> GROWTH["Growth IA\nA/B Testing\n🔴"]
     MKT_DIR --> MERCH["IA-Merch\nCross-sell/Upsell\n🔴"]
@@ -194,6 +202,11 @@ flowchart TD
     style CMO fill:#533483,color:#fff
     style CPO fill:#533483,color:#fff
     style SEO_LEAD fill:#0f3460,color:#fff
+    style SEO_MASTER fill:#0f3460,color:#fff
+    style KP_LEAD fill:#1a5276,color:#fff
+    style CONTENT_LEAD fill:#1a5276,color:#fff
+    style QA_LEAD fill:#1a5276,color:#fff
+    style EXEC_LEAD fill:#1a5276,color:#fff
 ```
 
 | Agent | Rôle | Statut | Budget | Squad |
@@ -201,6 +214,10 @@ flowchart TD
 | IA-CMO | Chief Marketing Officer | 🔴 NOT_APPROVED | — | Governance |
 | agent.seo.lead | SEO Lead | 🔴 NOT_APPROVED | — | Governance |
 | IA-SEO Master | Lead SEO Squad | 🔴 NOT_APPROVED | €25K | Business |
+| agent.seo.kp.lead | KP Lead — Keyword Planning (7 agents) | 🔴 NOT_APPROVED | — | Business |
+| agent.seo.content.lead | Content Lead — Content Gen (11 agents) | 🔴 NOT_APPROVED | — | Business |
+| agent.seo.qa.lead | QA Lead — Monitoring & QA (7 agents) | 🔴 NOT_APPROVED | — | Business |
+| agent.seo.exec.lead | Exec Lead — Technical SEO (6 agents) | 🔴 NOT_APPROVED | — | Business |
 | SEO Sentinel | Veille SEO concurrentielle | 🟡 APPROVED_WITH_CONDITIONS | €15K | Business |
 | IA-Marketing Director | Lead Marketing Squad | 🔴 NOT_APPROVED | €30K | Business |
 | Growth IA | A/B Testing & Growth | 🔴 NOT_APPROVED | €18K | Business |
@@ -386,6 +403,10 @@ flowchart TD
 | **Tech** | G14 | Bus-Factor Monitor | ⚪ | €3K | Tech |
 | **Tech** | G18 | Docs Drift Detector | ⚪ | €4K | Tech |
 | **Commerce** | IA-SEO Master | Lead SEO Squad | 🔴 | €25K | Business |
+| **Commerce** | agent.seo.kp.lead | KP Lead (7 agents) | 🔴 | — | Business |
+| **Commerce** | agent.seo.content.lead | Content Lead (11 agents) | 🔴 | — | Business |
+| **Commerce** | agent.seo.qa.lead | QA Lead (7 agents) | 🔴 | — | Business |
+| **Commerce** | agent.seo.exec.lead | Exec Lead (6 agents) | 🔴 | — | Business |
 | **Commerce** | SEO Sentinel | Veille SEO | 🟡 | €15K | Business |
 | **Commerce** | IA-Marketing Director | Lead Marketing | 🔴 | €30K | Business |
 | **Commerce** | Growth IA | A/B Testing & Growth | 🔴 | €18K | Business |
@@ -421,7 +442,7 @@ flowchart TD
 | **Perf/Expansion** | Expansion Squad | 15 agents intl/legal/partners | ⚪ | €52K | Expansion |
 | **Perf/Expansion** | Support Squad | 3 agents auto-fix/docs | ⚪ | €10K | Support |
 
-**Total Squads : 88 agents | Budget : €1,080K | ROI : +€4,839K/an (448%)**
+**Total Squads : 92 agents | Budget : €1,080K | ROI : +€4,839K/an (448%)**
 
 ---
 
@@ -456,6 +477,10 @@ dans les 88 squads (ils constituent la couche de coordination C-Level + leads) :
 | agent.seo.lead | AGENT-agent-seo-lead.md | 🔴 NOT_APPROVED |
 | agent.data.lead | AGENT-agent-data-lead.md | 🔴 NOT_APPROVED |
 | agent.rag.lead | AGENT-agent-rag-lead.md | 🔴 NOT_APPROVED |
+| agent.seo.kp.lead | AGENT-agent-seo-kp-lead.md | 🔴 NOT_APPROVED |
+| agent.seo.content.lead | AGENT-agent-seo-content-lead.md | 🔴 NOT_APPROVED |
+| agent.seo.qa.lead | AGENT-agent-seo-qa-lead.md | 🔴 NOT_APPROVED |
+| agent.seo.exec.lead | AGENT-agent-seo-exec-lead.md | 🔴 NOT_APPROVED |
 | agent.aicos.architect | AGENT-agent-aicos-architect.md | 🔴 NOT_APPROVED |
 | agent.aicos.governance | AGENT-agent-aicos-governance.md | 🔴 NOT_APPROVED |
 
