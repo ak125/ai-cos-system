@@ -233,8 +233,8 @@ flowchart TD
     subgraph QA_Auto["QA Automatisé"]
         F1["F1 — BAT Runner + RTM ⚪"]
         F4["F4 — E2E + Perceptual SSIM ⚪"]
-        M2Q["M2 — Mutation Testing ⚪"]
-        M4Q["M4 — Shadow Traffic Replay ⚪"]
+        M2Q["M2-QA-MutationTest — Mutation Testing ⚪"]
+        M4Q["M4-QA-ShadowReplay — Shadow Traffic Replay ⚪"]
     end
 
     subgraph UX_Suite["UX & Observabilité"]
@@ -261,8 +261,8 @@ flowchart TD
 | F3 | A11y Scanner WCAG | ⚪ Conceptuel | €12K | Quality |
 | F4 | E2E + Perceptual SSIM | ⚪ Conceptuel | €20K | Quality |
 | F5 | Observabilité UX | ⚪ Conceptuel | €15K | Quality |
-| M2 | Mutation Testing | ⚪ Conceptuel | €4K | Quality |
-| M4 | Shadow Traffic Replay | ⚪ Conceptuel | €5K | Quality |
+| M2-QA-MutationTest | Mutation Testing | ⚪ Conceptuel | €4K | Quality |
+| M4-QA-ShadowReplay | Shadow Traffic Replay | ⚪ Conceptuel | €5K | Quality |
 
 ---
 
@@ -409,8 +409,8 @@ flowchart TD
 | **Qualité** | F3 | A11y Scanner WCAG | ⚪ | €12K | Quality |
 | **Qualité** | F4 | E2E + Perceptual SSIM | ⚪ | €20K | Quality |
 | **Qualité** | F5 | Observabilité UX | ⚪ | €15K | Quality |
-| **Qualité** | M2 | Mutation Testing | ⚪ | €4K | Quality |
-| **Qualité** | M4 | Shadow Traffic Replay | ⚪ | €5K | Quality |
+| **Qualité** | M2-QA-MutationTest | Mutation Testing | ⚪ | €4K | Quality |
+| **Qualité** | M4-QA-ShadowReplay | Shadow Traffic Replay | ⚪ | €5K | Quality |
 | **Ops** | IA-Stock | Stock Forecaster | 🔴 | €35K | Ops |
 | **Ops** | IA-Transport | Transport Optimizer | 🔴 | €30K | Ops |
 | **Ops** | IA-Customs | Import/Export | 🔴 | €25K | Ops |
