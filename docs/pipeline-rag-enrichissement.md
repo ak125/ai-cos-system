@@ -7,7 +7,7 @@
 
 Le corpus RAG Automecanik contient 241 fichiers gamme (237 en schema v5.0, 3 legacy v1, 1 autre). L'objectif est d'enrichir systematiquement chaque gamme, valider la qualite, et promouvoir les gammes conformes.
 
-**Executeur** : RAG Lead via Paperclip (derogation experimentale, **Phase 0 uniquement**). Le statut governance-vault reste `NOT_APPROVED`. La derogation est limitee aux modes `audit_only` et `enrich_dry_run` sur une seule gamme. Extension a Phase 1 conditionnee a la reussite de Phase 0 et a une decision explicite a ce moment-la. Toute promotion (`qa_write`) ou ecriture corpus requiert une mise a jour prealable du verdict governance-vault.
+**Executeur** : RAG Lead via Paperclip (derogation experimentale, **Phase 0 + Phase 1**). Le statut governance-vault reste `NOT_APPROVED`. Phase 0/0b terminees avec succes (AUT-45, AUT-46 — 0 contamination, 0 derive). La derogation est etendue a Phase 1 avec les modes `audit_only`, `enrich_dry_run` et `enrich_write` (backup `_archive/` obligatoire avant toute ecriture). `qa_write` reste interdit jusqu'a mise a jour du verdict governance-vault.
 **State machine** : `lifecycle.stage` dans le frontmatter uniquement (pas de tickets Paperclip)
 
 ---
@@ -219,6 +219,16 @@ R0/R1 invoques seulement si l'enrichissement impacte le maillage, la compatibili
 |-------------|-------------|-------------------|
 | Critique (domain, selection, maintenance) | **>= 75** | **>= 70** |
 | Non-critique (diagnostic, installation) | >= 65 | >= 55 |
+
+#### Classification gamme par taux de blocs admissibles (calibre Phase 0b)
+
+| Taux blocs admissibles | Classification | Exemple Phase 0b |
+|------------------------|---------------|-----------------|
+| < 40% | `ENRICHMENT_REQUIRED` | bouchon-de-vidange (33%) |
+| 55-70% | `READY_WITH_LIMITS` | vanne-egr (67%) |
+| >= 90% | `READY` / `PROMOTE_CANDIDATE` | filtre-a-huile (93%) |
+
+> Seuil `READY_WITH_LIMITS` ajuste a 55% apres calibrage Phase 0b (initialement 65%).
 
 #### Blocs critiques pour promotion L1 (D1)
 
